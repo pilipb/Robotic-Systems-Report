@@ -60,7 +60,7 @@ The 3Pi+ is a robot designed for learning and as such is manufactured cost-effec
 \begin{figure}[h!]
     \centering
     \includegraphics[width = 0.49\textwidth]{img/robot_schemtatic.png}
-    \caption{The Pololu 3Pi+ robot dimensions}
+    \caption{Bottom view of the Pololu 3Pi+ CAD model with dimensions \cite{pololu_guide}}
     \label{fig:dimensions}
 \end{figure}
 
@@ -106,13 +106,13 @@ The robot records the number of wheel rotations between the tick marks (N), meas
     D = 2 \pi R N
 \end{equation}
 
-The distance measurement is taken between the two rising edges of the line sensor's detection signal, shown in Figure \ref{}.
-This aims to minimise any variation in distance measurements caused by changes in ambient light, which affect how early the sensor line detection threshold is crossed.
+The distance measurement is taken between the two rising edges of the line sensor's detection signal, shown in Figure \ref{fig:linesensor}.
+This aims to minimise any variation in distance measurements caused by changes in ambient light, which affects how early the sensor line detection threshold is crossed.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width = 0.3\textwidth]{img/linesensor-response.jpg}
-    \caption{Linesensor response}
+    \includegraphics[width = 0.47\textwidth]{img/linesensor_response.png}
+    \caption{Line sensor response and activation threshold}
     \label{fig:linesensor}
 \end{figure}
 
@@ -264,11 +264,21 @@ This metric and both of these observations provide a clear comparison point for 
 The results of the tests before and after calibration are shown in the section, comparing the change in metrics for each of three robots. 
 A paired t-test has been used to assess the significance of the results for each robot. A paired t-Test is selected as the variance of results before and after calibration is not assumed to be equal as this could be impacted by the calibration. The tests are performed at a 5\% significance level.
 
+\subsection{Measured dimensions}
+
+The dimensions measured by the calibration method for each of the three test robots are shown in Figure \ref{fig:r0r1L}. Although measurable, the difference between dimensions (R0, R1 and L) of any of the robots is not statistically significant \hl{($n = 10$, two-tail, $p > 0.05 $)} for any pairing. The median wheel radius is 16.25mm rather than 16mm. Similarly, the median wheelbase is 42.87mm rather than 42.7mm.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=.5\textwidth]{img/r0r1l.png}
+    \caption{Measured key dimensions}
+    \label{fig:r0r1L}
+\end{figure}
+
 \subsection{Linear accuracy}
 
 The first test compared results of the linear accuracy measurement of the three robots. 
-Pre-calibration the three robots all undershoot by varying amounts, while post calibration the robots' absolute mean error is smaller by an average of 8.2mm, showing a statistically significant decrease in error with an average paired t-test ($n = 10$, one-tail, $p = 0.004$). The distribution of errors for the three robots is shown in Figure \ref{fig:linear}.
-The average standard deviation of the error for all robots decreased from 1.66mm to 0.93mm suggesting an increase in precision.
+Pre-calibration the three robots all undershoot by varying amounts, while post-calibration the robots' absolute mean error is smaller by an average of 8.2mm, showing a statistically significant decrease in error with an average paired t-test ($n = 10$, one-tail, $p = 0.004$). The distribution of errors for the three robots is shown in Figure \ref{fig:linear}.
 
 \begin{figure}[h]
     \centering
@@ -281,13 +291,6 @@ The average standard deviation of the error for all robots decreased from 1.66mm
 
 The orientation error calculated from the UMBmark test is plotted in Figure \ref{fig:orientation}. The distributions appear to show a clustering of results based on the direction of travel around the test circuit in the baseline results.
 
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=.45\textwidth]{img/orientation_error.png}
-    \caption{Orientation error before and after calibration}
-    \label{fig:orientation}
-\end{figure}
-
 \begin{figure*}[h!]
     \centering
     \includegraphics[width=.9\textwidth]{img/xy_pre_post_2.png}
@@ -295,12 +298,18 @@ The orientation error calculated from the UMBmark test is plotted in Figure \ref
     \label{fig:xy_scatter}
 \end{figure*}
 
-A paired t-test reveals that there is significant clustering ($n = 5$, one-tail, $p < 0.05$) for all robot test results apart from the post calibration result of Robot A ($p=0.051$). The test also reveals an average increase in p-value between pre-calibration and post-calibration of over two-orders of magnitude (143.9) suggesting that the clustering reduces as a result of calibration. 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=.45\textwidth]{img/orientation_error.png}
+    \caption{Orientation error before and after calibration}
+    \label{fig:orientation}
+\end{figure}
 
+
+
+A paired t-test reveals that there is significant clustering ($n = 5$, one-tail, $p < 0.05$) for all robot test results apart from the post-calibration result of Robot A ($p=0.051$). The test also reveals an average increase in p-value between pre-calibration and post-calibration of over two orders of magnitude (143.9) suggesting that the clustering reduces as a result of calibration. 
 
 Additionally, Figure \ref{fig:orientation} shows a reduction in orientation error between the baseline and calibrated measurements for all robots. The difference is statistically significant ($n = 10$, one-tail, $p < 0.05$) for all robots with p-values $p=1.5\times10^{-6}$, $p=2.9\times10^{-9}$ and $p=0.01$ respectively. 
-
-
 
 \begin{figure}[h!]
     \centering
@@ -309,35 +318,43 @@ Additionally, Figure \ref{fig:orientation} shows a reduction in orientation erro
     \label{fig:xy_box}
 \end{figure}
 
-Figures \ref{fig:xy_scatter} and \ref{fig:xy_box} show the results from the UMBmark tests with respect to the final position error of the robots. Figure \ref{fig:xy_scatter} presents the position return error of the robots relative to the origin. The cluster centres are marked and separated by the test direction (CW or CCW). Together with Figure \ref{fig:xy_box}, the plots reveal a decrease in position error and spread of robot error. 
-The average standard deviation reduced by 10mm to 14mm as a result of calibration.
-For all robots, the return to home error paired  t-test found the difference between means to be
-significant ($n = 10$, one-tail $p < 0.05$). 
-
-
-
-
+Figures \ref{fig:xy_scatter} and \ref{fig:xy_box} show the pre and post-calibration position error from the UMBmark tests. 
+The cluster centres are marked and separated by the test direction (CW or CCW).
+Figure \ref{fig:xy_box} shows the distribution of linear Euclidean distances from the origin at the end of UMBmark tests, indicating a decrease in position error and standard deviation of errors. 
+The average standard deviation was reduced by 10mm to 14mm after calibration.
+For all robots, the return to home error paired t-test found the difference between means to be significant ($n = 10$, one-tail $p < 0.05$). 
 
 \section{Discussion and Conclusion}\label{sec:discussion_conclusion}
+
+The results of this study are used to discuss the original hypothesis:
 
 % Make a discussion of what your results showed - whether this supported or refuted your hypothesis. Try not to respond to your hypothesis as if you were right or wrong, or successful or unsuccessful.  Instead, evaluate your hypothesis for whether it helped you to learn something - was it a good question or prediction to make?  Was it useful in this way?  If not, in what way does the hypothesis need adjustment, to guide future experiments? 
 % In your discussion, use this as another opportunity to demonstrate/evidence your understanding. Try to avoid stating the obvious - instead, use analysis/evaluation/synthesis to show that you understand \emph{how} and \emph{why} you saw the results you did. 
 
+
+
 \begin{quote}
     \emph{
-    The authors hypothesize that variances in wheel diameter and wheelbase width significantly affect the odometry accuracy of the Pololu 3Pi+ robot.
-    This experiment predicts that a calibration circuit and method using onboard sensors can automatically measure key robot dimensions in the kinematic model.
+    The authors hypothesize that variances in wheel diameter and wheelbase width affect the odometry accuracy of the Pololu 3Pi+ robot.
+    This experiment predicts that a calibration circuit and method using onboard sensors can automatically measure key robot dimensions.
     By applying this calibration, we anticipate a measurable improvement in accuracy through a reduction in systematic odometry errors, when compared to performance using default dimensions.
     }
 \end{quote}
 
 \paragraph{Meaning}
-An overall analysis of the results suggests that there are measurable differences in the key robot dimensions and that an automatic calibration can improve the accuracy and precision of the robotic system. 
+An overall analysis of the results suggests that there are measurable but not statistically significant differences in the key robot dimensions. 
+This is not surprising given that size deviation would be measured during manufacturing, and statistically significant deviation would not pass quality control checks. 
+Although the average deviation from the official dimensions is 1.5\% for the radii and 0.4\% for the wheel base, this deviation, particularly in the radius dimension is shown to be consistent between robots.
+This suggests that setting the default radius value to 16.25mm rather than 16mm would likely improve the accuracy of most robots.
+
+The hypothesis is further supported by evidence in the linear and orientation accuracy tests, suggesting that automatic calibration can improve the accuracy and precision of the robotic system. 
 
 In order of results:
-Linear error and standard deviation decreases as a result of calibration.
-Orientation error and difference between CW and CCW results decreases as a result of calibration.
+Linear error and standard deviation decrease as a result of calibration.
+Orientation error and the difference between CW and CCW results decreases as a result of calibration.
 The final position error decreases significantly and and the standard deviation also decreases.
+
+
 
 But talk about the difference in directions.
 
