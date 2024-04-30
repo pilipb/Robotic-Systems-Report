@@ -36,7 +36,11 @@
 \maketitle
 
 \begin{abstract}
-It is normal to write the abstract last.  First, try to concisely state the problem/question/challenge under investigation.  Second, state what you found out.  The abstract should help a reader decide if they are interested in reading the whole paper.  Keep your abstract short.  Don't rely on the abstract to introduce your work.
+
+This report investigates the challenges of achieving accurate odometry in autonomous mobile robots, specifically the Pololu 3Pi+ robot. 
+By examining the effectiveness of an automated calibration circuit to measure key robot dimensions, this study aims to determine whether such calibration can significantly reduce systematic odometry errors compared to using default dimensions. 
+The findings reveal that the proposed calibration method can detect variations in wheel radii and wheelbase dimensions and the adjustments made through calibration improve the robot's odometry accuracy and precision. 
+The proposed calibration procedure has potential applications for low-cost, automated calibration of differential drive industrial robots or swarms.
 \end{abstract}
 
 
@@ -100,7 +104,7 @@ These dimensions are updated in the kinematic model and the calibrated system is
 
 \paragraph{Linear accuracy} The linear accuracy is tested by measuring a known distance using the 3Pi+'s line sensors and comparing the measured value to the true distance.
 The robot is driven at a slow, constant speed across two marked points spaced 500mm apart.
-The robot records the number of wheel rotations between the tick marks (N), measured by the encoders, and calculates the distance travelled using:
+The robot records the number of wheel rotations (N) between the tick marks, measured by the encoders, and calculates the distance travelled using:
 
 \begin{equation}
     D = 2 \pi R N
@@ -111,7 +115,7 @@ This aims to minimise any variation in distance measurements caused by changes i
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width = 0.47\textwidth]{img/linesensor_response.png}
+    \includegraphics[width = 0.49\textwidth]{img/linesensor_response.png}
     \caption{Line sensor response and activation threshold}
     \label{fig:linesensor}
 \end{figure}
@@ -120,27 +124,27 @@ This aims to minimise any variation in distance measurements caused by changes i
 The orientation accuracy of the robot is measured using the UMBmark test \cite{UMBmark}. 
 The robots complete two circuits around a 0.5m square and the orientation and distance error from the origin are recorded.
 Driving around the square twice, amplifies the accumulated systematic error, making it easier to measure precisely. 
-The test is run both clockwise and anti-clockwise to distinguish between systematic errors that cancel each other out.
+The test is run both clockwise (CW) and counter-clockwise (CCW) to distinguish between systematic errors that cancel each other out.
 
 \paragraph{Calibration}
-A test circuit was designed to calibrate the 3Pi+’s kinematics, shown in Figure \ref{}. 
+A test circuit was designed to calibrate the 3Pi+’s kinematics, shown in Figure \ref{fig:calibration_circuit}. 
 The line sensors are used to control the movement of the robot along the pre-defined printed path, allowing the deviation between the kinematic model and the true circuit dimensions to be used to calculate the wheel radii and the wheelbase length.
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width = 0.49\textwidth]{img/calibration_circuit.png}
-    \caption{Circuit diagram}
+    \caption{Calibration circuit diagram}
     \label{fig:calibration_circuit}
 \end{figure}
 
-The circuit comprises of a 0.5m straight line section, followed by a 180 degree turn, followed by another 0.5m straight line section. 
+The circuit comprises of a 0.5m straight line section, followed by a large radius 180-degree turn, followed by another 0.5m straight line section. 
 At the beginning and end of each section a perpendicular tick mark is printed to be used for the calibration procedure. 
-It is symmetrical to ensure that any calibration differences between a clockwise and anticlockwise calibration are averaged out.
+It is symmetrical to ensure that any calibration differences between a clockwise and counter-clockwise calibration are averaged out.
 
-\hl{needs a bit of re-wording:}
-The robot will complete the circuit by using the front line sensors to follow the path. 
-The side line sensors are used to begin and end the calibration calculations. 
-First, the robot completes the straight line section, measuring the distance between the tags based on the internal kinematics, comparing this to the known distance to calculate the wheel radii as seen in equation \ref{eq:linear}. in equations \ref{eq:linear} and \ref{eq:angle}, $R_i$ are the radii of the wheels, $C$ is the number of encoder counts per revolution, $d,\alpha$ are the circuit parameters: straight line distance and turn angle and $e_i$ are encoder counts for each wheel.
+The robot will complete the circuit by using the front line sensors to follow the line. 
+The side line sensors are used to begin and end the calibration calculations on the tick marks seen in Figure \ref{fig:calibration_circuit}. 
+First, the robot completes the straight line section, measuring the distance between the tick marks based on the internal kinematics, comparing this to the known distance to calculate the wheel radii as seen in equation \ref{eq:linear}. 
+In equations \ref{eq:linear} and \ref{eq:angle}, $R_i$ are the radii of the wheels, $C$ is the number of encoder counts per revolution, $d,\alpha$ are the circuit parameters: straight line distance and turn angle and $e_i$ are encoder counts for each wheel.
 
 \begin{equation}
 \label{eq:linear}
@@ -155,6 +159,21 @@ L = \left|\frac{\pi \times (\Delta e_0 \times R_0 - \Delta e_1 \times R_1)}{\alp
 \end{equation}
 
 Upon completion, the robot will enter a state in which it repeatedly prints these new values to the serial monitor. These values will then be updated manually in the kinematics of that robot.
+
+To verify that the calibration algorithm measures the differences in key dimensions of the robot correctly, a robot with one tyre removed and then the wheels levered apart (to increase the wheelbase) is tested on the calibration circuit. The results in Table \ref{tab:verify}, show that the algorithm correctly identifies differences between key robot dimensions.
+
+\begin{table}[h!]
+\centering
+\caption{Algorithm verification results}
+\label{tab:verify}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{l|c|c|c}
+                   & R0 & R1 & L \\ \hline
+Wheel removed      & \textbf{14.03}       & 16.23       & 42.89      \\ \hline
+Wheelbase extended & 16.17       & 16.20       & \textbf{44.56 }    
+\end{tabular}%
+}
+\end{table}
 
 
 % \begin{algorithm}
@@ -202,9 +221,9 @@ Upon completion, the robot will enter a state in which it repeatedly prints thes
 
 The baseline, calibration and post-calibration tests were conducted on 3 different robots to investigate the variation between robots. 
 
-First, the linear and orientation tests are completed on un-calibrated robots (using the default dimensions found on the robot data sheet \cite{}) to establish a baseline set of results. 
+First, the linear and orientation tests are completed on un-calibrated robots, using the default dimensions found on the robot data sheet \cite{pololu_guide} (shown in Figure \ref{fig:dimensions}), to establish a baseline set of results. 
 The linear distance test is run ten times for each robot, documenting the error on each run. 
-The orientation test involves two laps around the square track, completed five times in each direction; clockwise and anti-clockwise.
+The orientation test involves two laps around the square track, completed five times in each direction; clockwise and counter-clockwise.
 Both orientation and position error from the origin are recorded.
 
 Each robot is then calibrated using the calibration circuit and calibration algorithm. 
@@ -219,12 +238,11 @@ Finally, each robot is re-tested on the original linear and orientation error te
     \item \textbf{Controlled Variables}: 
     For each test, the \emph{distance} and number of \emph{laps} are kept constant. 
     Each robot runs the same test code, using the same kinematic model, motor and heading PID controllers. 
+    The target speed of the robot is kept at 75mm/s, with a maximum acceleration set to ensure minimal wheel slip.
     Furthermore, \emph{ambient lighting} is kept constant due to its influence on the readings from the IR line sensors. 
     New, fully charged batteries are used for each set of tests.
     \item \textbf{Independent Variable}: 
     The independent variable is the robot itself. 
-    
-    
     As the experiment relies on autonomous measurement by the robot, the only changing variable will be the robot, and as a result the robot dimensions - $R_0, R_1, L$. 
     The method aims to observe a measurable difference in these parameters between robots and use this to explain any improvements in system accuracy after calibration. 
     \item \textbf{Dependent Variable(s)}: this experiment aims to measure the accuracy of the robots before and after calibration. The metrics used for quantifying the accuracy are the linear error for linear tests, orientation error and Euclidean distance error on return-to-home on the orientation test.
@@ -266,7 +284,10 @@ A paired t-test has been used to assess the significance of the results for each
 
 \subsection{Measured dimensions}
 
-The dimensions measured by the calibration method for each of the three test robots are shown in Figure \ref{fig:r0r1L}. Although measurable, the difference between dimensions (R0, R1 and L) of any of the robots is not statistically significant \hl{($n = 10$, two-tail, $p > 0.05 $)} for any pairing. The median wheel radius is 16.25mm rather than 16mm. Similarly, the median wheelbase is 42.87mm rather than 42.7mm.
+The dimensions measured by the calibration method for each of the three robots are shown in Figure \ref{fig:r0r1L}. 
+Although measurable, the difference between dimensions (R0, R1 and L) of any of the robots is not statistically significant ($n = 10$, two-tail, $p > 0.05 $) for any pairing. 
+The median wheel radius is measured as 16.25mm rather than the data sheet dimension of 16mm. 
+Similarly, the median wheelbase is measured as 42.87mm rather than 42.7mm.
 
 \begin{figure}[h]
     \centering
@@ -278,11 +299,20 @@ The dimensions measured by the calibration method for each of the three test rob
 \subsection{Linear accuracy}
 
 The first test compared results of the linear accuracy measurement of the three robots. 
+
+\begin{figure*}[h!]
+    \centering
+    \includegraphics[width=.85\textwidth]{img/xy_pre_post_2.png}
+    \caption{Return to home position relative to the origin for all three robots in the clockwise and counter-clockwise direction. The darker marks show the mean location for each cluster.}
+    \label{fig:xy_scatter}
+\end{figure*}
+
 Pre-calibration the three robots all undershoot by varying amounts, while post-calibration the robots' absolute mean error is smaller by an average of 8.2mm, showing a statistically significant decrease in error with an average paired t-test ($n = 10$, one-tail, $p = 0.004$). The distribution of errors for the three robots is shown in Figure \ref{fig:linear}.
+
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=.45\textwidth]{img/linear_pre_post.png}
+    \includegraphics[width=.49\textwidth]{img/linear_pre_post.png}
     \caption{Linear error over 500mm before and after calibration}
     \label{fig:linear}
 \end{figure}
@@ -291,29 +321,20 @@ Pre-calibration the three robots all undershoot by varying amounts, while post-c
 
 The orientation error calculated from the UMBmark test is plotted in Figure \ref{fig:orientation}. The distributions appear to show a clustering of results based on the direction of travel around the test circuit in the baseline results.
 
-\begin{figure*}[h!]
-    \centering
-    \includegraphics[width=.9\textwidth]{img/xy_pre_post_2.png}
-    \caption{Return to home position relative to the origin for all three robots in the clockwise and anticlockwise direction. The darker marks show the mean location for each cluster.}
-    \label{fig:xy_scatter}
-\end{figure*}
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=.45\textwidth]{img/orientation_error.png}
-    \caption{Orientation error before and after calibration}
-    \label{fig:orientation}
-\end{figure}
-
-
-
 A paired t-test reveals that there is significant clustering ($n = 5$, one-tail, $p < 0.05$) for all robot test results apart from the post-calibration result of Robot A ($p=0.051$). The test also reveals an average increase in p-value between pre-calibration and post-calibration of over two orders of magnitude (143.9) suggesting that the clustering reduces as a result of calibration. 
 
 Additionally, Figure \ref{fig:orientation} shows a reduction in orientation error between the baseline and calibrated measurements for all robots. The difference is statistically significant ($n = 10$, one-tail, $p < 0.05$) for all robots with p-values $p=1.5\times10^{-6}$, $p=2.9\times10^{-9}$ and $p=0.01$ respectively. 
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width = 0.45\textwidth]{img/xy_error_boxplot.png}
+    \includegraphics[width=.49\textwidth]{img/orientation_error.png}
+    \caption{Orientation error before and after calibration}
+    \label{fig:orientation}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width = 0.485\textwidth]{img/xy_error_boxplot.png}
     \caption{The Euclidean distance error in return to home position before and after calibration.}
     \label{fig:xy_box}
 \end{figure}
@@ -331,8 +352,6 @@ The results of this study are used to discuss the original hypothesis:
 % Make a discussion of what your results showed - whether this supported or refuted your hypothesis. Try not to respond to your hypothesis as if you were right or wrong, or successful or unsuccessful.  Instead, evaluate your hypothesis for whether it helped you to learn something - was it a good question or prediction to make?  Was it useful in this way?  If not, in what way does the hypothesis need adjustment, to guide future experiments? 
 % In your discussion, use this as another opportunity to demonstrate/evidence your understanding. Try to avoid stating the obvious - instead, use analysis/evaluation/synthesis to show that you understand \emph{how} and \emph{why} you saw the results you did. 
 
-
-
 \begin{quote}
     \emph{
     The authors hypothesize that variances in wheel diameter and wheelbase width affect the odometry accuracy of the Pololu 3Pi+ robot.
@@ -341,63 +360,71 @@ The results of this study are used to discuss the original hypothesis:
     }
 \end{quote}
 
-\paragraph{Meaning}
-An overall analysis of the results suggests that there are measurable but not statistically significant differences in the key robot dimensions. 
-This is not surprising given that size deviation would be measured during manufacturing, and statistically significant deviation would not pass quality control checks. 
-Although the average deviation from the official dimensions is 1.5\% for the radii and 0.4\% for the wheel base, this deviation, particularly in the radius dimension is shown to be consistent between robots.
-This suggests that setting the default radius value to 16.25mm rather than 16mm would likely improve the accuracy of most robots.
+Analysis of the calibration data reveals some variability in the key dimensions across the tested units, which is possibly caused by manufacturing and assembly tolerances. 
+Although there are measurable differences in dimensions between the robots, they did not reach statistical significance (p $>$ 0.05 for all comparisons). 
+This indicates that while observable differences in key dimensions exist, they are not sufficiently large or consistent enough to be considered statistically reliable under the tested conditions.
+These findings suggest that the current measurement accuracy and precision are inadequate to reliably differentiate these deviations. 
+Improving the accuracy and precision of the calibration measurements is expected to reduce measurement variability, narrow confidence intervals, and result in smaller p-values, potentially increasing the statistical significance of these findings.
 
-The hypothesis is further supported by evidence in the linear and orientation accuracy tests, suggesting that automatic calibration can improve the accuracy and precision of the robotic system. 
+The median values for the wheel radius and wheelbase (16.25mm for radius instead of 16mm, and 42.87mm for wheelbase instead of 42.7mm) suggest that the default dimensions could be adjusted to better reflect the actual measurements found during calibration. 
+These adjusted values could potentially improve the baseline settings of future robots, improving their odometry accuracy out of the box.
 
-In order of results:
-Linear error and standard deviation decrease as a result of calibration.
-Orientation error and the difference between CW and CCW results decreases as a result of calibration.
-The final position error decreases significantly and and the standard deviation also decreases.
+The hypothesis predicts improvements in both linear and orientation accuracy through calibration.
+The linear error is lower post-calibration for all robots, due to a more accurate wheel radius, supporting the hypothesis that automatic calibration can improve the system's linear accuracy. 
 
+The clustering seen in the pre-calibration results for the CW and CCW tests is likely due to a mismatch in wheel sizes, and wheelbase width differing from the nominal.
+A mismatch in wheel radii causes the robot to drive along a curved path, while an incorrect wheelbase causes orientation error when turning 90 degrees.
+These errors add up when the robot completes laps of the square in one direction, and cancel out when completing the laps in the opposite direction.
+This combination of systematic errors causes the clustering separation between CW and CCW return positions seen in Figure \ref{fig:xy_scatter}.
+In extreme cases, testing in only one direction can appear to show a robot with accurate odometry (where systematic errors cancel out), however, when the robot completes the task in the opposite direction it is seen to have a much lower accuracy.
+The clustering separation is significantly reduced post-calibration, indicating that the calibration effectively identifies and corrects the sources of these systematic odometry errors. \\
 
+Very small deviations in key dimensions such as wheel radii and wheelbase widths, often less than 0.5mm, are shown to significantly impact the accuracy and precision of the robots odometry. 
+Typically, these small variations are beyond the measurement capability of standard rulers available to most users, meaning that this method of calibration will achieve better odometry accuracy than hand measurement techniques.
+Trial and error techniques can achieve better accuracy but are more time-consuming and prone to user error, making it impractical for applications with multiple robots or swarms.
 
-But talk about the difference in directions.
-
-Talk about the importance of the line sensor reading accuracy to this method
-
-
-
+Measuring the wheel radius accurately using metrology tools, such as vernier calipers, presents difficulties due to the compressibility of the rubber, and obstacles such as the wheel housing. 
+The proposed calibration method may prove particularly beneficial for the automatic measurement of the effective wheel radii of robots equipped with pneumatic tyres.
+In such cases, the effective wheel radius may vary based on the weight of a payload or changes in tyre pressure caused by changes in ambient temperature. 
+These factors complicate the direct measurement of wheel radii through conventional methods.
+Instead, measuring the wheel radii dynamically while the robot is in use could offer a more reliable and efficient solution for maintaining accurate odometry in robotic applications where wheel deformation is a concern, such as warehouse robotics or assembly lines.
 
 \paragraph{Limitations}
 
-\hl{limitations}
-The findings in this report are limited by a number of factors related to systematic and non-systematic errors and assumptions used for the control of the robot.
+The findings in this report are limited by a number of factors related to systematic and non-systematic errors and the assumptions used for the control of the robot. 
 
-The differential drive kinematic model assumes that wheel revolutions are directly proportional to linear distance, neglecting wheel slippage and mechanical differences in the drive \cite{odometry}.
+The are a number of potential sources of systematic error that are assumed to be negligible in this investigation.
+These are the gearbox slip, misalignment of wheels and the limits of the encoder resolution. 
+There is significant evidence in literature that the impact of these factors is much less than of those investigated in this study \cite{UMBmark}. 
+However, it is likely that these factors cause the differences in robot performance.
+Assuming these errors are negligible limits the accuracy of calibration. 
 
-Additionally, the system makes use of a PID controller that has been tuned to only one robot. For repeatability, this report assumes a calibrated PID with the responses of such a controller likely differing between robots. 
-To reduce the impact of a controller a larger test distance should be used, thereby allowing more time for a heading response to settle in the case of the UMBmark test.
+Non-systematic errors have been identified and attempts made to mitigate them, however, these errors still contribute to randomness in the distribution of results. 
+Their impact is mitigated by taking a large number of measurements. 
+Potential non-systematic errors include wheel slip, changes in lighting for line sensor reading accuracy, and surface irregularities. 
+These errors are controlled by limiting robot speed and acceleration, consistently controlling lighting, and using a clean, flat surface respectively. 
+However, due to the high measurement resolution required for accurate odometry, even minor environmental variations can induce errors.
 
-The are a number of potential sources of systematic error that are assumed to be negligible in this investigation, these are the gearbox slip, misalignment of wheels and the limits of the encoder resolution. There is significant evidence in literature that the impact of these factors is much less than of those investigated in this study. However it is likely that these factors cause the differences between robot performance.
+Limitations of the robot control implementation include the kinematic model and motor control. 
+The differential drive kinematic model assumes that wheel revolutions are directly proportional to linear distance, neglecting wheel slippage and mechanical differences in the drive \cite{odometry}. 
+It also approximates arcs with straight line segments, limiting the accuracy of the displacement calculation by the update period. This is mitigated through the use of high frequency kinematic updates and slower robot speeds, so straight line segments closely approximate arcs.
+However this could be improved further by using an arc based kinematic model.
 
+Additionally, the system uses a PID controller tuned for one of the robots, assuming the same response for all robots.
+Variations in the system response between robots could lead to increased wheel slip or worse heading control, resulting in larger orientation error on some robots. 
+To reduce the impact of a controller a larger test distance could be used, thereby allowing more time for a heading response to settle in the case of the orientation error test.
 
+\paragraph{Future work}
 
-- gearbox slip
-- you already need a calibrated a PID,tuned to only one robot
-- battery
-- wheel sizes are limited
-- Relies on the accuracy of the printed calibration sheet
-- Limits of the kinematic model - assumes linear movements does not calculate arcs or something like that
+Further work should look to improve the calibration accuracy, which is currently limited by unaccounted for systematic errors, non-systematic errors, the line sensor accuracy and the accuracy of the printed calibration circuit. 
+While mitigations for the systematic and non-systematic errors have been described above, a key area for further improvement is the line sensor accuracy. 
+These sensors are the only form of feedback the robot receives from the environment, and while a mitigation for threshold errors is described is Figure \ref{fig:linesensor}, the sensor readings are still subject to some random variation that can impact the calibration accuracy.
+Future accuracy improvements could be achieved by avoiding the limitations of the line sensors, using an alternate form of measurement, with external camera iR reflectors, or laser measurement, but this will increase cost and complexity.
+Sensor fusion using the built-in inertial sensors and magnetometer could be investigated. 
 
+A larger printed calibration circuit, making use of larger turn angles or combinations of turns in both directions, could further improve the accuracy of calibration measurements as the percentage error would decrease.
 
-
-
-It is understood that other robot features may also vary between the robots: \hl{the gearbox backlash etc} however this report predicts that such difference result in a lower magnitude error in accuracy and as such will not impact the analysis of results.
-
-
-\hl{further work:}
-automation, ensure that the external features are accounted for better? - lighting and gearbox
-counts per rev
-
-% Use the Conclusion section to discuss the implications of your study.  This should therefore link back to your introduction, which began with a broad statement of the problem area.  Now, with your results providing evidence, you could attempt to make recommendations for applications in this area or for future studies.
-% This is also a good opportunity to evaluate your experiment and project as a whole.  You may wish to further discuss the limitations of the study (e.g. the difficulty of controlled/dependent variables, or any problems you faced in your project).  When you did discover limitations in your method, use this to illustrate that you understand the issue by detailing how it could be rectified in future work.  When making a recommendation for future work ensure that this is a clear advancement from the understanding you have gained and not wild speculation.  It is not useful to see future work like ``I would use a high resolution doppler radar instead" - because this doesn't improve our understanding of your reported work, or how your work could be advanced in a meaningful way.
-
-
+Finally, for practical application, the process of dimension update should be automated. This will ensure that the time saving of calibration is much higher, and allow it to be integrated into general robotic tasks, for example as part of autonomous swarms.
 
 
 \bibliographystyle{ieeetr} 
